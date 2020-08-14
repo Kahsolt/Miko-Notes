@@ -1,0 +1,97 @@
+// MongoDB是面向文档的数据库
+// 官方客户端基于javascript
+
+零.基本概念
+1.文档
+    每个文档有一个特殊的键"_id"，是文档的唯一标志
+    文档是一个有序的键值对的集合 {"key":val,"key2":val2}
+2.集合
+    一组文档成为一个集合collection
+    集合可以有子集合，用点号分隔collect.subcollect
+3.数据库
+    多个集合组成一个数据库db
+4.服务端
+    mongod启动守护进程，端口号27017
+5.客户端
+    shell是一个完备的javascript的解释器，其中变量db被赋值为当前数据库对象
+    show dbs            //查看数据库
+    show collections    //查看集合
+    show users          //查看账户
+    use <数据库名字>     //切换数据库
+    db.getCollection("version") //如果集合名与函数名冲突
+    db.getLastError()
+
+一.简单数据操作
+1.新建
+    doc={"key":val}           //新建一个js对象
+    db.<集合名>.insert(doc)    //插入某个集合
+2.读取
+    db.find()
+    db.findOne()
+3.更新
+    doc.newKey=doc.oldVal             //修改键名
+    doc.oldKey="newVal"               //修改值
+    doc.newKey2=newVal                //增加新的键值对
+    delete doc.oldKey                 //删除旧的键值对
+    db.<集合名>.update({"uid":4}, doc)   //第一个参数为限定条件
+4.删除
+    db.remove()
+    db.remove({"uid":4})
+    db.drop_collection("collect1")
+5.复合更新
+    db.upsert({}, {})     //如果查询记录存在则更新，否则创建
+
+二.高级数据操作
+1.数据类型
+    null
+    true/false
+    32bit Int
+    64bit Int
+    64bit Float     // shell中只支持这种数字类型
+    字符串
+    符号             // shell中不支持，会变成字符串
+    对象ID           // "x" : ObjectId()
+        "_id"的类型，占12个字节：时间戳(4)+机器(3)+PID(2)+计数器(3)
+    日期             // "x" : new Date()
+    正则表达式        // "x" : /foobar/i
+    代码             // "x" : function() {/*..*/}
+    二进制数据        // shell中不可用
+    最大值            // shell中不可用
+    最小值            // shell中不可用
+    未定义            // "x" : undefined
+    数组              // "x" : [1, 2.0, "3"]
+    嵌套文档          // "x" : {"y" : "z"}
+
+2.内置的修改器
+    $inc    增加值，键不存在则创建(值必须是数字类型，初值为0)
+        db.webAnalyze.update(
+            {"url" : "www.foo.bar"},
+            {"$inc" : {"pageview" : 1}"}     //使得对应文档的pageview键值增加了1
+        )
+    $set    指定值，键不存在则创建
+        db.user.update(
+            {"username" : "kahsolt"},
+            {"$set" : {"age" : 17}"}     //使得对应文档的age键值变成了17
+        )
+    $unset  清除键
+        db.user.update(
+            {"username" : "kahsolt"},
+            {"$unset" : {"age" : 1}"}     //使得对应文档的age键值消除
+        )
+    $push/$pop  数组增删
+    $addToSet   集合增加(自动去重)
+    $each       迭代器，后接数组    {"each" : [1, 2, 3]}
+
+三.查询
+    db.col.find()
+    db.col.find({"price" : 5})
+    逻辑运算符：$in,$or,$not
+        db.col.find({"price" : 5, "category" : "bunga"})        //复合条件：And
+        db.col.find({"work" : {"$in" : [1, 2, 3]}})
+        db.col.find({"or" : [{"work" : {"$in" : [1, 2, 3]}, {"done" : true}}]})
+        db.col.find({"not": {"work": {"in" : [1, 2, 3]}}})
+    比较运算符：$lt,$gt,$lte,$gte
+        db.col.find({"price" : {"gte" : 20, "lte" : 100}})      //范围查询
+        
+    db.col.find({}, {"username" : 1, "password" : 1})       //保留指定的键值对，1表示true
+    db.col.find({}, {"_id" : 0})       //剔除指定的键值对，0表示false

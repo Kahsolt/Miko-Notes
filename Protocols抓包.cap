@@ -1,0 +1,261 @@
+1.ARP
+层次
+  链路层和网络层之间；基于Ethernet II
+流程
+  0.A想给B发数据，已知IP[B]，需知MAC[B|Gateway]
+  1.A检查本地arp缓存(arp -a)
+  2.A检查IP[B]是否和自己同网段，向本地网络广播ARP请求
+      Who has IP[B|Gateway]? Tell IP[A]
+  3.B|Gateway单播ARP响应
+      IP[B|Gateway] is at MAC[B|Gateway]
+请求报文(广播)
+  以太帧   DstMAC(6B) SrcMAC(6B) 荷载协议类型(2B)
+              全FF     MAC[A]    0x0806(ARP)
+  ARP报文  硬件类型(2B)     解析协议类型(2B)
+            1(Ethernet)       0x0800(IPv4)
+           硬件地址长度(1B)  协议长度(1B) 操作类型(2B)
+                 6                4        1(reqst)
+           发送硬件地址 发送IP 目标硬件地址 目标IP
+              MAC[A]     IP[A]     全00      IP[B]
+回复报文(单播)
+  以太帧   DstMAC(6B) SrcMAC(6B) 荷载协议类型(4B)
+              MAC[A]     MAC[B]    0x0806(ARP)
+  ARP报文  硬件类型(2B)     解析协议类型(2B)
+            1(Ethernet)       0x0800(IPv4)
+           硬件地址长度(1B)  协议长度(1B) 操作类型(2B)
+                 6                4         2(reply)
+           发送硬件地址 发送IP 目标硬件地址 目标IP
+              MAC[B]     IP[B]     MAC[A]    IP[A]
+
+2.IP
+层次
+  网络层；基于Ethernet II
+报文
+  以太帧   DstMAC(6B) SrcMAC(6B) 荷载协议类型(2B)
+            MAC[GW]     MAC[A]     0x0800(IPv4)
+  IP报文   版本(4b) 首部长度(4b) 特殊服务标志(6+2b) 报文总长(2B)
+            0100(4)  0101(5=20B)  紧急、拥塞提示      单位B
+           分片序号标识(2B) 标记(4b) 分片偏移(1B)
+               报文合并      MF/DF    帧分片合并
+           存活时间TTL(1B) 荷载协议(1B) 首部校验和(2B)
+              比如64/128    TCP/ICMP等
+           源IP(4B) 目的IP(4B) 选项(<=40B) 数据(<=65535B-20B)
+             IP[A]    IP[B]      一般没有      减去IP头
+IP分片
+  IP报文最大为65535B，但以太帧MTU数据限制为1500B
+  因此可能要分片，每个分片只有1480B的IP报文数据
+  *建议在传输层发多个小报文，使用连续的分片序号标识来合并
+   而不是发大报文，在链路层被打碎，然后由分片偏移来合并
+
+3.UDP
+层次
+  传输层：基于IP
+报文
+  IP报文   荷载协议 0x17(UDP)
+  UDP报文  源端口(2B) 目的端口(2B) 数据长度(2B) 校验和(2B)
+             Port[A]    Port[B]       单位B
+           数据(<=65515B-8B)
+            IP荷载减去UDP头
+4.TCP
+层次
+  传输层：基于IP
+流程
+          A                       B  
+      seq=x[SYN]
+     <SYNC_SENT> 
+                        seq=y,ack=x+1[SYN+ACK]
+                             <SYNC_RECV>
+  seq=x+1,ack=y+1[ACK]
+     <ESTABLISHED>          <ESTABLISHED>
+                  data->
+                  <-data
+    seq=u[FIN+ACK]
+     <FIN_WAIT1>
+                          seq=v,ack=u+1[ACK]
+                             <CLOSE_WAIT>
+                  <-data
+                          seq=w,ack=u+1[FIN+ACK]
+                              <LAST_ACK>
+      seq=u+1[ACK]
+      <TIME_WAIT>               <CLOSE>
+        等2MSL
+       <CLOSE>
+  *seq：各自的计数器，表示发送的最后一个字节编号
+   ack：向对方申请下一个字节编号
+  *握手的第三步可以携带数据，seq=x+1
+   若不携带数据则不消耗序号，下一个报文也是seq=x+1
+报文
+  IP报文   荷载协议 0x06(TCP)
+  TCP报文  源端口(2B) 目的端口(2B) 序号seq(4B) 确认号ack(4B)
+             Port[A]    Port[B]     已发字节     期望字节
+           首部长度(4b) -(6b) 标记flags(6b) 窗口大小wnd(2B)
+            0110(6=24B)        U|A|P|R|S|F    接收者缓存
+           校验和(2B) 紧急指针(2B) 选项(<=40B) 数据(<=65515B-20B)
+                       U标记有效     一般没有    IP荷载减去TCP头
+
+5.ICMP
+层次
+  网络层和传输层之间；基于IP协议
+报文
+  IP报文   荷载协议 0x01(ICMP)
+  ICMP报文 类型(1B) 代码(1B) 校验和(2B)
+            类型域   子类型
+           可变域(?B)
+           控制/差错
+
+    * 类型 代码 含义
+       0    0   回显(响应)
+       3    x   网络/主机/协议/端口等不可达或未知，传输失败或被禁止
+       4    0   源抑制，例如缓冲区满
+       5    x   网络/主机/服务等重定向
+       8    0   回显(请求)
+       9    0   路由器(响应)
+       10   0   路由器(请求)
+       11   x   超时
+       12   x   报文参数有问题
+       17   0   地址掩码(请求)
+       18   0   地址掩码(响应)
+
+6.DHCP
+层次
+  应用层；基于UDP:67
+流程
+  0.A想要一套IP配置，本地网络上有至少一个DHCP服务器
+  1.A广播DHCP Discover
+  2.每个DHCP服务器单播DHCP Offer
+  3.A选择一套IP配置，广播DHCP Request
+  4.每个DHCP服务器检查IP配置是否是自己提供的，单播DHCP ACK
+类型
+  Discover  客户端探查服务器的位置
+  Offer     服务器提供一套IP配置
+  Request   客户端申请使用某套IP配置
+  ACK       服务端同意申请，锁定配置资源
+  NAK       服务器否拒提供过某IP配置
+  Release   客户端主动释放配置资源
+  Decline   客户端报告申请到的配置无法使用
+  Inform    客户端查询配置详细
+
+7.DNS
+层次
+  应用层；基于UDP:53
+报文
+  DNS报文  业务ID号(2B) 标识(1+4+1+1+1+1+3+4b)
+             问答对应   QR|OpCode|AA|TC|RD|RA|-|RespCode
+           问题计数(2B) 回答计数(2B) 域名服务器计数(2B) 额外记录计数(2B)
+           问题区段(?B) 回答区段(?B) 权威区段(?B) 额外信息区段(?B)
+           *区段变长，例
+             Name: www.baidu.com
+             Type: 0x0001(A)
+             Class: 0x0001(IN)
+             TTL: 0x0000001f(31)
+             Data Len: 0x0004(4)
+             Address: 123.125.115.110
+类型Type
+  值  类型   含义
+  1   A      IPv4地址
+  2   NS     权威域名服务器
+  5   CNAME  规范别名
+  12  PTR    指针，IP地址转域名
+  15  MX     邮件交换记录，根据收件人地址后缀定位邮件服务器
+  16  TXT    注释性文本
+  28  AAAA   IPv6地址
+  251 IXFR   增量区域传送
+  252 AXFR   完整区域传送
+
+8.HTTP
+层次
+  应用层；基于TCP:80
+报文
+  <METHOD> <URI> <VERSION>  # 请求报文
+  <VERSION> <STATUS> <MSG>  # 响应报文
+  [<HEADER>: <VALUE>]
+  [<HEADER>: <VALUE>]
+  [...]
+                            # 回车换行隔开请求头和正文
+  [TEXT]
+  *版本VERSION
+     HTTP/1.0   非持久连接，每个文件请求一个TCP连接、两个RTT
+     HTTP/1.1   流水线持久连接，一个TCP连接上异步发多个HTTP请求
+   方法METHOD
+     HEAD       仅返回响应头
+     GET        返回资源
+     POST       提交数据并做处理
+     PUT        更新资源
+     PATCH      局部修改资源
+     DELETE     删除资源
+     OPTIONS    查询某资源所支持的方法
+     TRACE      回显服务器收到的请求
+     CONNECT    HTTP/1.1中预留给能将连接改为管道的代理服务器 
+   状态码和描述STATUS/MSG
+     1xx   继续
+     2xx   成功
+     3xx   重定向
+     4xx   客户端错误
+     5xx   服务端错误
+   请求头HEADER
+     通用
+       Cache-Control       控制缓存方式
+       Connection          是否适用持久连接
+       Date                时间戳
+       Pragma              特殊指令，比如Pragma:no-cache
+       Upgrade             协议切换(101)
+     资源实体
+       Allow               对应URI所支持的方法
+       Content-Encoding    资源编码
+       Content-Language    资源自然语言
+       Content-Length      资源长度
+       Content-Location    资源位置
+       Content-MD5         MD5值
+       Content-Type        MIME类型
+       Expire              有效期
+       Last-Modified       最后修改时间
+     客户端
+       Accept              可接受MIME类型
+       Accept-Charset      可接受字符集
+       Accept-Encoding     可接受编码格式，比如gzip
+       Accept-Language     可接受语言
+       Authorization       身份认证信息
+       Cookie              记录信息
+       Host                主机名
+       If-Modified-Since   如果时间戳新于，否则返回304
+       Referer             触发访问此页面的源
+       User-Agent          浏览器信息
+     服务器
+       Location            请客户端重定位
+       Server              服务器信息
+
+9.HTTPS=HTTP+SSL/TLS
+层次
+  会话层+应用层；基于TCP:443
+流程
+        C                   S
+  请求https连接
+                      返回证书(公钥)
+  产生随机对称密钥
+  使用公钥对密钥加密
+  发送加密的随机密钥
+  协商加密等级
+  通过用对称密钥加密的密文通信
+SSL流程
+  服务器认证阶段
+    0.客户端发送Hello，开始新的会话连接
+    1.服务器判断客户端是否需要生成主密钥，发送公钥以及生成主密钥所需信息
+    2.客户端产生主密钥，用公钥加密后传给服务器
+  用户认证阶段
+    3.服务器返回一个用于主密钥认证的任意提问
+    4.客户端返回数字签名后的提问及其公开密钥，服务器进行核对
+
+10.FTP
+层次
+  应用层；基于TCP:21(control)+20(data)
+
+11.SMTP/POP/IMAP
+层次
+  应用层；基于TCP:25/110/143
+流程
+  1.邮件用户代理MUA --(SMTP)--> 邮件传输代理MTA[一个SMTP服务器]
+  2.MTA --(SMTP)--> MTA --(SMTP)--> [..Relays...] --(SMTP)--> 目标MTA
+  3.MTA --> 邮件分发代理MDA --> 信箱(磁盘文件系统/数据库/...)
+  4.MUA --(POP/IMAP)--> MTA[另一个POP/IMAP服务器]
+  5.MTA --(POP/IMAP)--> MUA --> 本地磁盘
+

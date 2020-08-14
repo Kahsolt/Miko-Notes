@@ -1,0 +1,112 @@
+[Schema]
+  Command := 
+  (command)(number)(text object) | (number)(command)(text object)
+  command := A-Z|a-z
+  number  := 0|^|$|w|b|{1..}
+*A double-write command,
+   e.g.: dd/cc/yy
+ usually means a shortcut on current line 
+
+[Commands]
+0	Motion: goto BOL
+$	Motion: goto EOL
+(	Motion: goto beginning of this sentence
+)	Motion: goto beginning of next sentence
+{	Motion: goto beginning of this paragraph
+}	Motion: goto beginning of next paragraph
+[[	Motion: goto beginning of this section
+]]	Motion: goto beginning of next section
+%	Motion: goto the corresponding bracket
+~	Modify: toggle char case
+|	Motion: goto Nth char in this line
++	Motion: goto BOL of Nth line (default: 1)
+-	Motion: goto BOL of Nth line (default: 1)
+.	Action: redo last action  
+;	Search: next downwards search within line
+,	Search: next upwards within line
+/	Search: downwards within file
+?	Search: upwards within file
+
+A	Insert: append to EOL
+a	Insert: append after cursor
+B	Motion: go back to prev BOW (ignore punctuals)
+b	Motion: go back to prev BOW
+C
+c	Modify: change content
+D
+d	Modify: delete
+E	Motion: goto EOW (ignore punctuals)
+e	Motion: goto EOW
+F	Search: upwards within this line, find char
+f	Search: downwards within this line, find char
+G	Motion: goto the Nth line (default: EOF)
+g	Motion: goto prev Nth line
+  gg	goto BOF
+H	Motion: goto hightest line in this screen
+h	Motion: go left
+I	Insert: insert at BOL
+i	Insert: insert at curosr
+J	Modify: conjuction two lines
+j	Motion: go down
+K
+k	Motion: go up
+L	Motion: goto lowest line in this screen
+l	Motion: go right
+  nl	Nth char of this line
+M	Motion: goto middle line in this screen
+m
+N	Search: next upwards within file
+n	Search: next downwards within file
+O	Insert: a new line above
+o	Insert: a new line below
+P	Modify: paste buffer before cursor
+p	Modify: paste buffer at cursor
+  [a-z]p	paste buffer named 'a'-'z'
+Q	Mode:   switch to ex editor
+q
+R	Modify: replace till <ESC> (overwrite mode)
+r	Modify: replace one char
+S	Modify: replace current line (=cc)
+s	Modify: replace several chars
+T	Search: upwards within this line, find char, put cursor one char before
+t	Search: downwards within this line, find char, put curosor one char after
+U	Action: undo all with current line
+u	Action: undo last action
+V
+v	Select: visual selection
+W
+w
+X	Modify: delele one char before cursor
+x	Modify: delete one char
+Y	Select: copy line (=yy)
+y	Select: copy
+  [a-z]nyy	copy n lines to buffer named 'a'-'z'
+Z
+  ZZ	save and exit
+z	Motion
+  z		scroll screen to make current line the top line
+  z.	scroll screen to make current line the central line
+  z-	scroll screen to make current line the bottom line
+
+^]	Tag:    goto tag
+^B	Motion: scroll one screen back
+^D	Motion: scroll half screen down
+^E	Motion: scroll one line forward
+^F	Motion: scroll one screen forward
+^G	Info:   show cursor position info
+^L	UI:     repaint this screen
+^O	Motion: go back to further place
+^T  Tag:    go back to further tag
+^U	Motion: scroll half screen up
+^W	Window: switch focus between windows
+^Y	Motion: scroll one line back
+
+[:ex-Command]
+:set nu	display line-number
+:s/old/new			replace this line first 'old' to 'new'
+:s/old/new/g		replace this line all 'old' to 'new'
+:n,m s/old/new/g	replace line #n to #m all 'old' to 'new'
+:%s/old/new/g		replace the text all 'old' to 'new'
+
+[:Command]
+:!	execute shell

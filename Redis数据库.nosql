@@ -1,0 +1,210 @@
+# Redis是一个基于Key-Value的内存数据库
+
+零.服务器配置
+默认端口	6379
+默认数据库	0号，默认共16个数据库
+AOF			配置appendonly yes和appendfilename <FILENAME>，相当于持久化到磁盘的事务日志
+
+一.基本命令：
+0.键的命名
+  不加引号的字面字符串，若有空格则需加引号
+  建议用"类型:ID:属性"来命名，用句号"."取代空格
+    例如：user:1:last.name doujinshi:2:author.website
+
+1.通用
+SELECT db				选择所使用的数据库，默认0号
+KEYS pattern			列出匹配的Key，使用glob风格通配符
+  ?		匹配一个字符
+  *		匹配零或多个字符
+  []	匹配方括号内的字符，-表范围，^表取反
+  \x	强制转义字符x
+EXISTS key				判断Key存在，返回0或1
+DEL key	[key...]		按Key删除记录
+TYPE key				按Key查询记录的类型，返回string/hash/list/set/zset
+
+2.字符串类型string
+SET key value			赋值
+MSET key value [key value..]
+GET key					取值
+MGET key [key..]
+INCR key				整数自增
+INCRBY key increment
+INCRBYFLOAT key increment
+DECR key				整数自减
+DECRBY key increment
+APPEND key value		串尾连接
+STRLEN key				取长度
+GETBIT key offset		位操作
+SETBIT key offset value
+BITCOUNT key [start] [end]
+BITOP operation dest key [key..]
+  operation可为AND/OR/XOR/NOT
+  BITCOUNT AND res x y	# 将字符串x与y按位与，存入res中
+BITPOS key 0/1 [start] [end]	在第start个字节到第end个字节间从右起查找第一个0/1比特出现的位置(以比特计数)
+
+3.散列类型hash
+HSET key field value
+HSETNX key field value	字段不存在时赋值
+MHSET key field value [field value..]
+HGET key field
+MHGET key field [field..]
+HGETALL key				获取所有键和值，键-值交替
+HKEYS key				获取所有键
+HVALS key				获取所有值
+HLEN key				取字段计数数量
+HEXISTS key field		判断字段存在
+HINCRBY key field increment
+HDEL key field			删除字段
+
+4.列表类型list
+LPUSH key value [value..]	左端追加元素
+RPUSH key value [value..]	右端追加元素
+LPOP key				左端取元素
+RPOP key				右端取元素
+RPOPLPUSH src dst		从src右端弹出元素，并追加到dst左端
+LLEN key				取列表长度
+LRANGE key start end	按索引区间取列表片段，支持负索引
+LREM key count value	删除前count个值为value的元素
+  count > 0 时，从左边开始删除
+  count < 0 时，从右边开始删除
+  count = 0 时，删除所有
+LINDEX key index		按索引取值
+LSET key index value	按索引赋值
+LINSERT key BEFORE|AFTER pivot value	从左往右找到值为pivot的元素，将value插入到该元素之前|之后
+LTRIM key start end		删除索引不在start到end之间的所有元素
+
+5.集合类型set
+SADD key member [member..]
+SREM key member [member..]
+SMEMBERS key			获取所有成员
+SCARD key				获取成员数量
+SISMEMBER key			判断是否在集合中
+SPOP key				随机弹出一个成员
+SRANDMEMBER key [count]	随机获取成员
+  count > 0 时，获取count个不相同元素
+  count < 0 时，获取-count个可能相同的元素
+SDIFF key [key..]		求差集
+SDIFFSTORE dest key [key..]
+SINTER key [key..]		求交集
+SINTERSTORE dest key [key..]
+SUNION key [key..]		求并集
+SUNIONSTORE dest key [key..]
+
+6.有序集合zset：带优先级的集合
+ZADD key score member [score member..]
+ZSCORE key member		获取某成员的分数
+ZRANGE key start end [WITHSCORES]
+ZREVRANGE key start end [WITHSCORES]
+...
+
+
+二.进阶
+1.事务
+批处理
+  MULTI		开启批处理
+  EXEC		执行批处理；没有回滚机制，出错会继续执行
+监控
+  WATCH key	如果WATCH之后所监控的key改变了值或被删除，则之后的EXEC事务中对key的操作都不起作用
+  UNWATCH	取消所有监控
+
+2.过期
+TTL key				查看生存时间
+EXPIRE key seconds	设置生存时间，SET/GETSET命令会清空过期
+EXPIREAT key seconds	使用Unix时间戳，指定时刻
+PEXPIREAT key milliseconds
+
+3.排序
+SORT key [ALPHA] [LIMIT offset count] [BY field] [DESC] [GET field..] [STORE key]
+  ALPHA		强制字典序，用于元素非数值时
+  例如：SORT blog:posts BY post:*->time DESC GET post:*->title
+  
+
+4.消息队列
+BLPOP key timeout		阻塞式从左端取元素，超时单位s，0表示无限
+BRPOP key timeout
+PUBLISH channel message
+SUBSCRIBE channel
+UNSUBSCRIBE [channel..]	不带参数则取消所有订阅
+PSUBSCRIBE channel		带通配符订阅
+PUNSUBSCRIBE [channel..]
+
+5.Lua脚本
+EVAL "return {KEYS[i], ARGV[j]}"
+  例如：eval "return redis.call('set','foo','bar')" 0
+        eval "return redis.call('set',KEYS[1],'bar')" 1 foo
+        eval "return {1,2,{3,'Hello World!'}}" 0
+        eval "return {1,2,3.3333,'foo',nil,'bar'}" 0
+
+6.快照
+SAVE
+BGSAVE		异步备份
+FLUSHALL	清空所有数据
+
+三.实现原理
+0.Redis数据库
+typedef struct redisDb {
+  dict *dict;			/* keyspace */
+  dict *expires;		/* timeout for violate keys */
+  dict *blocking_keys;	/* blcoked keys that still awaiting (BLPOP) */
+  dict *ready_keys;		/* blocked keys that recieved a PUSH */
+  dict *watched_key;	/* keys that are WATCHED */
+  dict id;				/* default config opens 0~15 dbs */
+} redisDb;
+
+1.Redis对象
+typedef struct redisObject {
+  unsigned type : 4;
+  unsigned notused : 2;
+  unsigned encoding : 4;
+  unsigned lru : 22;
+  int refcount;
+  void *ptr;
+} robj;
+TYPE key				获取类型，对应type域，取值为宏REDIS_*
+  *取值为STRING/LIST/SET/ZSET/HASH
+OBJECT ENCODING key		获取内部编码，对应encoding域，取值为宏REDIS_ENCODING_*
+  *取值为RAW(字节数组)/INT/HT(哈希表)/ZIPMAP/LINKEDLIST/ZIPLIST/INTSET/SKIPLIST/EMBSTR(字符串)
+类型-内部编码对应关系
+  string	raw/int/embstr
+  hash		hashtable/ziplist
+  list		linkedlist/ziplist
+  set		hashtable/intset
+  zset		skiplist/ziplist
+
+2.string类型
+struct sdshdr {
+  int len;		/* 串长度 */
+  int free;		/* 缓冲区剩余空间 */
+  char buf[];
+};
+字符串：raw与embstr
+  embstr	不超过39字节的短字符串，对应的redisObject和其内ptr指针指向的sdshdr在物理空间上连续分配
+  raw		长字符串，或者APPEND会把embstr变成raw；不连续
+数字int：可用64位有符号数表示的字符串
+  对应redistributionObject的ptr域不作指针，而直接存数值
+  Redis启动时会预先建立0~9999共1w个数字对象(但若配置了maxmemory，则不使用这些k共享对象)
+
+3.hash和list类型
+hashtable与ziplist：透明转换
+  hashtable		字段多，域名长；散列表
+  ziplist		字段少，域名短；紧凑的列表，结构如下
+    uint32_t	zlbytes		整个结构所占空间
+    uint32_t	zltail		到末尾元素的偏移量
+    uint16_t	zllen		域数量
+    若干个域，结构如下：
+      前一个元素大小
+      当前元素编码类型
+      当前元素大小
+      当前元素内容
+    int8_t		zlend		魔数255，标识列表尾
+linkedlist与ziplist：透明转换
+  linkedlist	双向链表
+
+4.set类型
+struct intset {
+  uint32_t	encoding;	/* 默认是INTSET_ENC_INT16 */
+  uint32_t	length;
+  int8_t	contents[];
+};
+intset与hashtable：透明转换
+  intset	有序因此可二分查找，但写性能差、只能全存整数

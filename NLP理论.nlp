@@ -1,0 +1,18 @@
+# NLP自然语言处理基本理论和方法
+
+格语法Case Grammer
+In the room, he broke a window with a hammer.
+[ break
+  [ case - frame
+    agent: he
+    object: a window
+    locative: in the room
+    instrument: a hammer
+  ]
+  [ modals
+    time: past
+    voice: active
+  ]
+]
+
+语音-词法-句法-语义-语用(敬语)-话语规约(上下文)

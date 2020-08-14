@@ -1,0 +1,120 @@
+#Android是一种基于Linux的自由及开放源代码的操作系统，主要使用于移动设备
+#现由Google公司和开放手机联盟领导及开发
+
+零.Android系统架构
+Applications
+	Standard App:
+		Home —— Main screen
+		Contacts —— contacts database
+		Phone —— dial phone numbers
+		Browser —— view web pages
+		Email Reader —— compose & read email messages
+	User App
+Application Framework
+	Package Manager: Keep track of all App Packages on device
+	Windows Manager: Manage the windows comprsing an App
+	View System: Provide common user interface elements
+	Resource Manager: Manage non-compiled resources
+	Activity Manager: Manage App lifecycle and navigation stack
+	Content Provider: Inter-application data sharing
+	Location Manager: Provide location & movement information
+	Notification Manager: Place notification icons in the status bar when important events occur
+Library + ^Android Runtime
+	System C Library: Bionic Libc
+	Surface Manager: Display + Management
+	Media
+	Framework: Audio + Video
+	Webkit: Browser Engines
+	OpenGL: Graphics Engines
+	SQLite: Relational + Database Engine
+	^Core Java Libraries
+		Basic Java Classes —— JAVA.* JAVAX.*
+		App Lifecycle —— ANDROID.*
+		Internet/Web Service —— ORG.*
+		Unit Testing —— JUNIT.*
+	^Dalvik Virtual Machine: Designed for resource-constrained environment
+		->Typical Workflow:
+			App written in Java
+			Compiled to Java bytecode files
+			Converted to a single DEX bytecode file(classes.dex) by DX
+			Executed by Dalvik Machine
+Linux Kernel —— Standard Service + *Android-specific
+	Security
+	Memory & Process Management
+	File & Network I/O
+	Device Drivers
+	*Power Management
+	*Android Shared Memory
+	*Low Memory Killer
+	*Interprocess Communication
+
+一.应用组成基础
+1.Application Building-flow:
+	Android project
+		-> Compilation & Packaging
+	Android Package(.apk)
+		-> Signing + ADB
+	Android Emulato/Device
+
+2.Application Creation-flow:
+	Define resources: String, Layout, Image, Menu, Animation
+		*Allow App to be customized for different devices and users
+		String: Individual string, string array, plural
+			*Typically stored in Res/Values/*.XML
+				XML: <string name="string_name">Aloha!</string> 
+				Java: R.string.string_name
+				Res: @string/string_name
+		Layout: Specigy different layout files based on device's orientation, screen size, etc...
+			*Typically stored in Res/Layout/*.XML
+				Java: R.layout.layout_name
+				Res: @layout/layout_name
+	Implement application classes: At least one Activity, initialization code usually in onCreate()
+		onCreate() workflow:
+			Restore saved state
+			Set content view
+			Initial UI elements
+			Link UI elements to code actions
+	Package application: Package application components & Resources into .apk file
+		*Developers specify required application information in AndroidManifest.XML
+			AndroidManifest.XML:
+				Application Name
+				Components
+				Other:
+					Required permissions
+					Application features
+					Minimum API Level
+	Install & Run application (for Debugging)
+		Debug in Emulato/Device
+		Debug via USB cable
+			% adb install <path_to_apk>
+			
+3.四个基本Class
+Activity: Primary class for user interaction
+	Implement a single, focused task
+		onCreate(): when Activity is created, usually set up initial state
+		onRestart(): if the Activity has been stopped and is about to be started again
+		onStart(): Activity is about to become visible
+		onResume(): Activity is visible and about to start interaction with user
+		onPause(): focus about to swicth to another Activity
+		onStop(): Activity is no longer visible to user
+		onDestroy(): Activity is about to be destroyed
+Service: Run in the backgroud
+	Perform long-running operations
+	Support interaction with remote processes
+Broadcast Receiver: Listen for and respond to events
+	The subscriber in publish/subscribe pattern
+	Events represented by the Intent Class and the Broadcast
+	Receive and respond to broadcast events
+Content Provider: Store & share data across applications
+	Use database-style interface
+	Handle interprocess communication
+
+
+	
+	
+	
+	
+	
+	
+	
+	

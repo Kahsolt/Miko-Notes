@@ -1,0 +1,198 @@
+; 一般来说51单片机用51汇编语言
+//但也可以用C语言来编写
+
+零.8051汇编指令
+0.操作数符号
+	#data	立即数，取字面data的值
+	Rn		寄存器(R0~R7)，取n号工作寄存器的值
+	direct	直接寻址，取地址编号direct处的值
+	@Ri		间接寻址，取地址编号为i号工作寄存器的值处的值
+	bit		位寄存器，如P0.1
+1.数据移动
+	MOV direct,A/Rn/direct/@Ri/#data
+	MOV @Ri,A/direct/#data
+	MOV DPTR,#data16
+	MOV C,bit
+	MOV bit,C
+		读写RAM：DPTR实即DPH和DPL，C即CY
+	MOVX A,@Ri/@DPTR
+	MOVX @Ri/@DPTR,A
+		读写扩展RAM：必须用A寄存器作中转(一般@Ri或@DPTR放扩展RAM中将要读写的地址)
+	MOVC A,@A+DPTR/@A+PC
+		读ROM：查程序寄存器中的常量数据表
+2.算术运算
+	ADD A,Rn/direct/@Ri/#data
+	ADDC A,Rn/direct/@Ri/#data
+		带进位，若有进位则会将PSW的CY位置位
+	SUBB A,Rn/direct/@Ri/#data
+		没有不带借位减法指令，如有需要只需减法前手动清零CY位即可
+	MUL AB
+		计算A和B的乘积，A低位B高位，溢出时置位PSW中的OV
+	DIV AB
+		计算A和B的商余，A商数B余数，除零时置位PSW中的OV
+	INC Rn/direct/@Ri/#data/DPTR
+	DEC Rn/direct/@Ri/#data
+		这两个增量指令不影响PSW中的OV
+3.逻辑运算
+	CLR A/C/bit
+		清零
+	SETB C/bit
+		置位
+	CPL A/C/bit
+		按位取反
+	SWAP A
+		A交换高低4位
+	RL/RLC A
+		A逻辑左移/带进位左移(进位CY拼在寄存器A左边，然后对这9位数进行操作)
+	RR/RRC A
+		A逻辑右移/带进位右移
+	XCH A,Rn/direct/@Ri
+		交换寄存器
+	XCHD A,@Ri
+		交换寄存器低4位
+	ANL A,Rn/direct/@Ri/#data
+	ANL direct,A/#data
+	ANL C,bit//bit
+	ORL 操作数同理ANL
+	XRL 操作数同理ANL
+		C即CY(PSW里的位累加器)
+		bit例如P0.1
+		/bit例如/P0.1，即先对P0.1取反
+4.栈操作(先初始化栈顶：MOV SP,#7FH)
+	PUSH direct
+	POP direct
+5.地址跳转
+	AJMP addr11		; 短转移(2k)
+	LJMP addr16		; 长转移(64k)
+	SJMP rel		; 相对转移(256B)
+	JMP @A+DPTR
+	JZ/JNZ rel
+		A=0跳转
+	JC/JNC rel
+		CY=1跳转
+	JB/JNB bit,rel
+		bit=1跳转
+	JBC bit,rel
+		bit=1跳转，并清零bit位
+	CJNE A,direct/#data,rel
+	CJNE Rn/@Ri,#data,rel
+		opr1!=opr2跳转，会自动置位CY位(前者大CY=0，否则CY=1)
+	DJNZ Rn/direct,rel
+		opr1先减一，若不为0跳转
+6.函数调用返回
+	ACALL addr11
+	LCALL addr16
+	RET
+		函数返回
+	RETI
+		中断函数返回
+7.其他
+	DA A
+		10进制BCD码调整(似乎很难很少用)
+	NOP
+8.伪指令
+	ORG rel
+		确定之后紧接着第一条指令的地址
+	DB 字节常熟或字符或表达式
+	DW 字或字串
+	EQU 值
+		给标号赋值(类似于无参宏定义)
+	END
+		汇编结束
+	
+一.程序基本
+0.程序框架
+	[汇编]从0000H开始运行
+		T2CON	EQU		0C8H	; 一些字节寄存器地址命名
+		TR2		BIT		T2CON.2	; 一些寄存器位地址命名
+			ORG     0000H		; PC从0000H开始运行，因此跳至MAIN段以开始主函数
+			LJMP    MAIN
+			ORG     0003H		; 一些中断注册
+			LJMP    ISR
+			ORG     0100H		; 设置主函数地址(选一个安全的地址即可)
+		MAIN:
+			NOP					; 主函数体
+			SJMP    MAIN		; 让MAIN段死循环
+			;SJMP	$			; 或者死循环在本行
+		ISR:
+			NOP					; 中断处理函数体
+			RETI				; 中断返回(带有清零“优先级生效”触发器效果的RET)
+			END					; 程序结束
+	[C语言]从main()开始运行
+		#include <STC89C5xRC.H>
+		sfr T2CON=0xC8;		//一些字节寄存器地址命名
+		sbit TR2=T2CON^2;	//一些寄存器位地址命名
+		void main()
+		{
+			//主函数体
+			while(1);
+		}
+		void ISR(void) interrupt N using M
+		{
+			//中断处理函数体
+		}
+1.注册中断
+	[汇编]在对应的中断向量地址处加一个LJMP跳转到自定义的中断函数入口处
+		ORG     0003H	; INT0的中断向量地址
+		LJMP    ISR		; 放一个指向中断处理函数的跳转语句
+	ISR:
+		NOP				; 中断处理
+		RETI			; 中断返回
+	[C语言]使用interrupt和using变格为中断处理函数
+		void 中断函数名(void) interrupt 中断序号 using 工作寄存器区号
+		{
+			//中断处理
+		}
+2.自定义函数
+	[汇编]：用CALL和RET
+		CALL	DELAY		; 函数调用
+	DELAY:					; 函数段定义
+		MOV     R0,#20
+		MOV     R1,#0
+		MOV     R2,#0
+	DELAY1:
+		DJNZ    R2,DELAY1
+		DJNZ    R1,DELAY1
+		DJNZ    R0,DELAY1
+		RET
+3.预处理器
+	[汇编]：
+		#define A B		; 宏定义
+		#if				; 条件汇编
+			; 汇编块1
+		#elif
+			; 汇编块2
+		#endif
+		
+二.功能的使用
+1.中断
+    ORG     0000H
+    LJMP    MAIN
+    ORG     0003H			;(INT0’s ISR vector located at 0003H)
+    LJMP    EXINT0
+    ORG     0100H
+MAIN:
+    MOV     SP,#7FH			;初始化SP(如果要用), 这是传统8051的RAM上限
+    SETB    IT0				;set INT0 int type (1:Falling 0:Low level)
+    SETB    EX0				;enable INT0 interrupt
+    SETB    EA				;open global interrupt switch
+    SJMP    $
+EXINT0:
+    CPL     P0.0
+    RETI
+    END
+2.定时器
+void Init_Timer0(void)		//定时器初始化子程序
+{
+	TMOD |= 0x01;	//使用Timer0，16位定时器，使用"|"符号可以在使用多个定时器时不受影响		     
+	TH0=0x00;		//给定初值，这里使用定时器最大值:从0开始计数一直到65535溢出
+	TL0=0x00;
+	EA=1;			//总中断打开
+	ET0=1;			//定时器中断打开
+	TR0=1;			//定时器开关打开
+}
+void Timer0_isr(void) interrupt 1 using 1	//定时器中断函数
+{
+	TH0=0x00;		//重新赋值，Timer0是16位计数器，不能硬件自动清零
+	TL0=0x00;
+}

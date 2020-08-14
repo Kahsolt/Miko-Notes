@@ -1,0 +1,12 @@
+# GET
+GET /app/tag/?data={} HTTP/1.0
+Host: sf.kahsolt.tk
+
+# POST
+POST /app/tag HTTP/1.0
+Host: sf.kahsolt.tk
+Content-Type: application/json;charset=utf-8
+Content-Length:23
+
+{"name":"usingrawpost"}
+

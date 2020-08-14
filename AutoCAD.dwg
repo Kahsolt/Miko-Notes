@@ -1,0 +1,42 @@
+#AutoCAD是一个工程工业制图软件，用于2D、3D图形绘制
+
+零.基本操作
+矩形选择工具	单击左键，移动鼠标，再单击左键
+套索工具·		长按左键并移动
+退出图形绘制	Esc
+
+一.基本图形元素
+1.点
+Point/po	绘制单点；多点绘制用工具栏按钮
+DDPTYPE/ptype	设置点样式
+Divide/div	定数等分
+Measure/me	定距等分
+2.线
+l	直线Line：直线段
+	参数：C闭合 U撤销最近
+	*Shift键	锁定水平垂直，相当于正交
+xl	构造线XLine：两边无限延伸，一般用作辅助线
+	参数：H水平 V垂直 A角度 B二等分 O偏移
+pl	多段线PLine：直线弧线可切换
+	参数：A圆弧 C闭合 H半宽 L长度 U撤销最近 W宽度
+ray	射线Ray：单方向无限延伸
+spl	样条曲线SPLine：给定点，自动补充曲线段
+	参数：T端点相切 L公差 U撤销最近 C闭合
+ml	多线MLine：1~16根平行曲直线组成
+	参数：J对正 S比例 ST样式
+helix	螺旋线Helix：等距螺旋
+	参数：A轴端点 T圈数 H圈高 W扭曲
+3.圆
+c	圆Circle
+el	椭圆Ellipse
+do	圆环Donut
+arc	圆弧Arc
+4.矩形
+rec	矩形Rectangle
+pol	多边形Polygon
+
+二.坐标系
+1.世界坐标系WCS：笛卡尔右手系
+2.用户坐标系UCS：绕Z轴旋转过的WCS
+3.极坐标系：格式为"距离<角度"，逆时针角度为正；相对坐标时前缀"@"符号
+

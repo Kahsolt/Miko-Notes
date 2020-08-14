@@ -1,0 +1,464 @@
+﻿<!--HTML超文本标记语言是万维网的核心，通常是静态网页-->
+<!--HTML5+CSS3是目前的趋势-->
+
+零.HTML基础
+1.格式约束
+	HTML
+	XHTML：强制XML格式
+		标记必须成对出现
+		属性必须用双引号
+		强调数据类型：定义DTD、约束xmlns
+	HTML5
+
+2.HTML4结构
+<!DOCTYPE html ...>
+<html>
+	<head>
+		<title>...</title>
+		<script>
+			...
+		</script>
+	</head>
+	<body>
+		...
+	</body>
+</html>
+
+3.HTML4基础
+<body>
+	background
+	bgcolor
+	text	文本颜色
+	link/vlink/alink
+<font>
+	face	字体
+	size
+	color
+<b><i><u><hx(1~6)>
+<sup><sub>
+<acronym title="">	文本标注，光标指向时显示
+<br/>
+<hr/>
+	align
+	width
+	size
+	color
+<pre>	保留文本格式
+<p>
+	align
+<a>
+	href	超链接/锚点(#前缀)
+	target="_blank"	新窗口打开
+<img>
+	src
+	alt
+	align				*top/bottom/middle/left/right
+	border/bordercolor
+	width/height
+	hspace/vspace
+	dynsrc				动画源
+	start="fileopen"	动画自动播放
+<table>-<tr><td><th>
+	colspan/rowspan
+	width/height
+	border
+	bgcolor
+<ol><ul>-<li>
+<dl>-<dt><dd>
+<frameset>-<frame>/<noframes>
+	rows/cols
+	src
+	longdesc
+	frameborder
+	marginwidth/marginheight
+	noresize
+	scrolling
+<div>
+<span>
+*特殊符号
+&nbsp;
+&quot;
+&amp;
+&brvbar;
+&reg;
+&copy;
+&deg;
+&plusmn;
+&middot;
+&times;
+&devide;
+
+4.HTML5结构
+<!DOCTYPE HTML>
+<meta charset="UTF-8">
+<header>
+<nav>
+<section>
+	<article>+<aside>
+	<figure>
+<section>
+<footer>
+<address>
+
+5.HTML5新标签
+<mark>
+<hgroup>
+<time>-<datetime>
+<time>
+	datetime
+	pubdate
+<meter>
+	high/low
+	max/min
+	optimum		最佳值
+	value
+<progress>
+	max
+	value
+<menu>-<menuitem>
+	autosubmit
+	label		背景色	
+	type		*context/toolbar/list
+		label	菜单项标题
+		icon
+		onclick
+	*可被别的标签以id的方式引用，如<p contextmenu="myMenu">Hello~</p>
+<details>-<summary>		下拉展示隐藏信息
+<script></script>
+	async	异步执行脚本
+
+一.JavaScript语言
+1.结构
+<script language="JavaScript">
+	//写在head或body里面，内置js代码
+	/*两种注释方式*/
+</script>
+<script src="*.js"></script>	//引用js文件
+2.数据类型及定义
+var 变量名;		//弱类型定义
+	Undefined	申明的变量未初始化
+	Null		空值，引用未定义变量
+	Boolean		逻辑型
+	String		字符串型
+	Number		数值型
+3.运算符
+delete	删除定义的对象
+void	舍弃运算的值，返回undefined；如void(x+y)
+===		恒等，数值和类型都相等
+!==		不恒等，数值和类型都不等
+>>		有符号数右移
+>>>		无符号数右移
+		*控制语句：同理于Java
+4.输出
+document.write("屏幕打印");
+alert("弹出对话框");
+prompt();	//输入信息框
+confirm();	//OK/Cancel确认框
+5.函数
+function 函数名(形参表)	//形参表不带类型定义(因为都是弱类型var故省略)
+{
+	函数体
+}
+6.JavaScript内置类
+基类Object
+	toLocalString()
+	toString()
+	valueOf()
+数组Array：var arr=new Array(数组长度);
+	length
+	shift()
+	unshift()
+	pop()
+	push()
+	contact()
+	slice()
+	join()		数组连成字符串；参数为分隔符，默认为逗号
+	reverse()
+	sort()
+日期Date
+	set~()/get~()
+		FullYear/Year/Month/Day/Hour/Minutes/Seconds/Milliseconds
+		Date/Time
+	toString()
+	valueOf()
+数学Math
+	round()		最近整数
+	random()	0~1随机数
+	pow()
+	sqrt()
+	...
+字符串String
+	length
+	charAt()
+	indexOf()/search()/match()
+	split()
+	substr()/substring()
+	toLowerCase()/toUpperCase()/replace()
+浏览器信息navigator:Windows
+	appCodeName/appName
+	appMinorVersion/appVersion
+	browserLanguage/systemLanguage/userLanguage
+	cookieEnabled/onLine
+	cpuClass/platform
+文档document:Windows
+	title
+	bgColor/fgColor/linkColor/alinkColor/vlinkColor
+	URL
+	fileCreatedDate/fileModifiedDate
+	fileSize
+	cookie
+	charset
+	write()
+	createElement(Tag)
+	getElementById(Id)/getElementByName(Name)
+7.常用事件
+onload/onunload/onabort/onerror
+onfocus/onblur
+onsubmit/onselect
+onchange
+onclick/ondblclick
+onkeydown/onkeypress/onkeyup
+onmousedown/onmousemove/onmouseout/onmouseover/onmouseup
+
+二.表单及文件处理
+1.HTML4表单	
+<form>
+	id
+	action
+	method		get/post
+<input>
+	value
+	size/maxlength
+	readonly
+	type	*text/password/hidden/file
+			radio/checkbox
+			button/reset/submit
+	autofocus
+	disabled
+<textarea>
+	cols/rows
+	disabled
+	readonly
+<select>
+	<option>
+	value
+	selected
+2.HTML5表单
+<form>
+	autocomplete
+	novalidate
+<input>
+	type	*text/number/range/color/file
+			date/datetime/week/month
+			url/email/search/submit
+	value
+	max/min/step
+	autocomplete
+	autofocus
+	placeholder
+	required
+<datalist>
+	<option>
+	label
+	value
+<keygen>
+<output>
+	onforminput
+*表单验证：checkValidity()
+	<button onclick="document.表单id.待验证域id.checkValidity()">验证</button>
+
+三.CSS
+1.结构
+	行内	style="property:value;property:value;..."
+	内部	<style type="text/css">
+				selector {property:value;property:value;...}
+				//selector可以是HTML标签、class或者id
+			</style>
+	外部	<link rel="stylesheet" type="text/css" href="CSS文件名.css" />
+2.CSS2常用属性
+颜色与背景
+	color
+	background-color
+	background-image
+	background-position
+	background-attachment	*fixed/scroll
+	background-repeat		*repeat-x/repeat-y/repeat/norepeat
+字体
+	font-family
+	font-size
+	font-style		*normal/bold/italic
+	font-weight		*normal/bold/bolder/lighter
+	font-variant	*normal/small-caps/inherit
+文本属性
+	text-align		*left/right/center/inherit
+	text-decoration	*none/underline/overline/line-through/blink/inherit
+	text-indent
+	word-spacing
+	line-height
+	direction		*ltr/rtl/inherit
+	white-space		*normal/pre/nowrap/pre-wrap/pre-line/inherit
+超链接
+	a:link
+	a:visited
+	a:hover
+	a:active
+列表
+	list-style-type		*none/disc/circle/square/demical|demical-leading-zero
+						upper|lower-roman/-alpha/-latin/-greek
+						hebrew/armenian/georgian/cjk-ideographic/hiragana|hiragana-iroha/katakana|katakana-iroha
+	list-style-image
+表格
+	background-color
+	caption-side
+	border
+		border-width
+		border-style
+		border-color
+	border-collapse
+	border-spacing
+	empty-cells
+	height/width
+	padding
+	text-align/vertical-align
+CSS轮廓
+	outline
+		outline-color
+		outline-style	*none/dotted/dashed/solid/double/groove/ridge/inset/outset/inherit
+		outline-width	*thin/medium/thick/length/inherit
+浮动元素
+	float	*left/right/none/inherit
+3.CSS3新增
+边框圆角效果
+	border-radius
+		border-top-left-radius
+		border-top-right-radius
+		border-bottom-left-radius
+		border-bottom-right-radius
+边框颜色
+	border-top-color
+	border-bottom-color
+	border-left-color
+	border-right-color
+边框阴影
+	box-shadow/-webkit-box-shadow/-moz-box-shadow
+背景图片
+	background-size		*指定宽度px/auto/cover/contain
+文字多列
+	column		*指定列数/auto
+嵌入字体
+	@font-face{
+		font-family:'SomeFont.ttf';
+		src:url('SomeFont.ttf');
+		font-weight:normal;
+		font-style:normal;
+	}
+透明度
+	opacity		*取值0~1
+HSL和HSLA颜色表现方法
+	hsl(色调值,饱和度值,亮度值)
+	hsla(色调值,饱和度值,亮度值,透明度值)
+	色调	调色盘，0和360为红色，120为绿色，240为蓝色
+	饱和度	百分比，0%为灰度，100%饱和度最高
+	亮度	百分比，50%为均值
+	透明度	取值0~1
+		*应用如background-color:hsla(240,75%,50%,0.7)
+
+四.Canvas绘图
+1.准备canvas元素
+<canvas id="myCanvas" width="500" height="500">浏览器并不支持Canvas</canvas>
+<script type="text/javascript">
+	var canvas=document.getElementById("myCanvas");
+	var ctx=canvas.getContext("2d");
+</script>
+2.绘制图形
+直线	ctx.LineTo
+移动	ctx.MoveTo
+矩形	ctx.fillRect(x,y,w,h);		//填充
+		ctx.strokeRect(x,y,w,h);	//边框
+		ctx.clearRect(x,y,w,h);		//擦除
+清空	ctx.clear();
+二次方贝塞尔曲线
+三次方贝塞尔曲线	
+缩放	scale
+阴影	ctx.shadowOffSetX=10;
+		ctx.shadowOffSetX=10;
+		ctx.shadowBlur=7.5;		//模糊
+
+五.多媒体
+1.基本格式
+视频格式	MP4
+视频编码	H.264
+音频编码	AAC
+2.音频
+	<audio>标签
+		src
+		autoplay
+		loop/loopstart/loopend
+		start/end
+		playcount
+		controls
+		poster
+		<source>	*备用音频源
+	JavaScript脚本中的audio对象
+		选定对象
+			media=new audio("sample.wav");	//新建音频对象
+			var media=document.getElementById('music');	//取得HTML中已有的对象
+		对象属性
+			networkState
+			currentTime
+			volume/duration/src
+			paused/ended/muted
+			loop/autoPlay/controls
+		对象方法
+			canPlayType()
+			load()/play()/pause()
+		对象事件
+			loadstart/progress/suspend
+			play/pause/ended/volumechange
+			*js代码中加入media.addEventListener("ended",playagain,true);
+			 则播放结束后会自动调用playagain()函数
+3.视频
+	<video>标签
+		poster
+	JavaScript脚本中的video对象
+		选定对象
+			media=new video("sample.mp4");	//新建视频对象
+			var media=document.getElementById('movie');	//取得HTML中已有的对象
+		对象属性
+			videoWidth/videoHeight/width/height
+			preload
+		对象方法：与audio相同
+		对象事件
+			canplay/loadeddata/waiting
+
+六.本地储存
+1.存储方式
+	HTML4
+		Cookie
+		Session
+	HTML5
+		localstorage
+		sessionstorage
+		web SQL数据库
+		IndexedDB
+2.localstorage/sessionstorage
+数据保存
+	localstorage.setItem("Key","Value");
+	localstorage.key="Value";
+	localstorage["key"]="Value";
+数据获取
+	var value=localstorage.getItem("Key");
+	var value=localstorage.key;
+	var value=localstorage["key"];
+数据删除
+	localstorage.removeItem(Key);
+	localstorage.clear();
+*sessionstorage语法的相同
+
+七.地理位置
+	var retval=geolocation.getCurrentPosition(successCallback,errorCallback,options);
+	var watchId=geolocation.watchPosition(successCallback,errorCallback,options);
+	var retval=geolocation.clearWatch(watchId);
+
+八.jQuery
+

@@ -1,0 +1,204 @@
+<!--一个好用的前端框架，主要是CSS，也带少量js-->
+
+零.基础
+0.响应式魔数
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+一.基本
+1.文本与排版
+	lead	强调，稍大、细、高
+	muted
+	text-warning
+	text-error
+	text-info
+	text-success
+	initialism	变小<abbr>
+	pull-right	右对齐<blockquote>
+2.列表
+	unstyled	去掉<ul>的圆点
+	dl-horizontal	对齐定义列表
+	*定义列表标签结构：
+		<dl>
+			<dt>
+				<dd></dd>
+			</dt>
+		</dl>
+	*代码段标签：
+		<code></code>		<!--常用于单行-->
+		<pre></pre>
+	table
+	table-striped|bordered|hover|condensed	表格修饰
+	success|error|warning|info	行颜色修饰
+	*表格标签结构：
+		<table>
+			<caption></caption>
+			<thead><tr><th></th></tr></thead>
+			<tbody><tr><td></td></tr></tbody>
+		</table>
+3.表单
+	form-search + search-query(对input)	单行搜索表单
+	form-inline		行内表单
+	*普通表单结构：
+		<form class="form-horizontal">
+			<div class="control-group">
+				<label class="control-label"></label>
+				<div class="controls">
+					<input />
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="controls form-actions">
+					<label><input type="checkbox"/>Remember Me</label>
+					<button>Submit</button>
+				</div>
+			</div>
+		</form>
+	*表单结构：
+		<form><fieldset>
+			<legend></legend>
+				<label></label>
+				<input />
+				<span>info</span>
+				<label><input type="checkbox"/></label>
+			<button>Submit</button>
+		</fieldset></form>
+	checkbox|radio	修饰checkbox|radio附带的label
+	inline		变成行内元素
+	*input前后修饰框
+		<div class="input-prepend input-append">
+			<span class="add-on">$</span>
+			<input class="span2"/>
+			<span class="add-on">.00</span>
+		</div>
+	*input后缀修饰按钮
+		<div class="input-append">
+			<input class="span2"/>
+			<button class="btn">Search</button>
+			<button class="btn">Options</button>
+		</div>
+	input-block-level	修饰input，占整行
+	span<i>		i取1~12，基于网格设置控件大小
+	input-mini|small|medium|large|xlarge|xxlarge
+	uneditable-input
+	help-inline|block	修饰<span>一般写简短帮助
+4.按钮
+	btn		按钮根效果
+	btn-primary|info|success|warning|danger|inverse|link
+	btn-mini|small|medium|large|xlarge|xxlarge
+	btn-block	修饰button，占整行
+	btn-group|toolbar
+5.图片
+	img-rounded|circle|polaroid
+	icon-<name> + (icon-white)	使用自带的icon
+	*缩略图
+	<a class="thumbnail">
+		<img />
+	</a>
+	*相册
+	<ul class="thumbnails">
+		<li class="span4">
+			<div class="thumbnail">
+				<img />
+				<div class="caption">
+					<h3></h3>
+					<p></p>
+					<p><a></a></p>
+				</div>
+			</div>
+		</li>
+		...
+	</ul>
+6.标签
+	label	根效果，方块
+	label-success|warning|important|info|inverse
+	badge	根效果，椭圆
+	badge-success|warning|important|info|inverse
+7.警示框
+	alert(-block)
+	alert-error|success|info
+	<div class="alert">
+		<a href="#" class="close" data-dismiss="alert">&times;</a>
+		<strong>Warnning!</strong>But nothing happend...
+	</div>
+8.洼地
+	<div class="well">
+	</div>
+		
+二.高级
+1.下拉菜单
+	<ul class="dropdown-menu pull-right">
+		<li class="dropdown-submenu">
+			<a>More...</a>
+			<ul class="dropdown-menu"><li><a></a></li></ul>
+		</li>
+		<li><a></a></li>
+		<li class="divider"></li>
+		<li><a></a></li>
+	</ul>
+2.导航
+	nav		根效果
+	nav-tabs|pills|stacked	修饰<ul>
+	navbar-inverse	反色
+	*带搜索的导航栏
+	<ul class="nav">
+		<li><a></a></li>
+		<li class="divider-vertical"></li>
+		<form class="navbar-form pull-left">
+			<input />
+			<button></button>
+		</form>
+	</ul>
+	*滚动跟随的顶部导航条
+	<div class="navbar navbar-static-top">
+		<div class="navbar-inner">
+			<a class="brand">Title</a>
+			<ul class="nav">
+				<li class="active"><a>Home</a></li>
+				<li><a></a></li>
+			</ul>
+		</div>
+	</div>
+	*层进式导航
+	<ul class="breadcrumb">
+		<li><a>Home</a><span class="divider">/</span></li>
+		<li><a>Electronic</a><span class="divider">/</span></li>
+		<li><a>Raspberry Pi</a><span class="divider">/</span></li>
+	</ul>
+	*分页导航
+	<div class="pagination pagination-centered">
+		<ul>
+			<li><a>&laquo;</a><li>
+			<li><a>1</a><li>
+			<li><a>2</a><li>
+			<li><a>3</a><li>
+			<li><a>&raquo;</a><li>
+		</ul>
+	<div>
+	*翻页导航
+	<ul class="pager">
+		<li><a>Previous</a><li>
+		<li><a>Next</a><li>
+	</ul>
+	<ul class="pager">		贴到左右边
+		<li class="previous"><a>Previous</a><li>
+		<li class="next"><a>Next</a><li>
+	</ul>
+3.模态框
+	<!--Switch-->
+	<div>
+		<a href="#myModal" role="button" class="btn" data-toggle="modal">Launch</a>
+	<div>
+	<!--Modal-->
+	<div id="myModal" class="modal hide fade">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			<h3>New Modal</h3>
+		</div>
+		<div class="modal-body">
+			<p>something here</p>
+		</div>
+		<div class="modal-footer">
+			<a class="btn">Close</a>
+			<a class="btn btn-primary">Save</a>
+		</div>
+	</div>

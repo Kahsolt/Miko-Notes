@@ -1,0 +1,12 @@
+HELO
+EHLO
+AUTH LOGIN      # BASE64加密过的密码
+MAIL FROM:<76126128@qq.com>
+RCPT TO:<8454051@qq.com>
+SUBJECT test
+DATA
+
+This is the body of a test mail.
+.               # 以.结束邮件正文
+
+BYE

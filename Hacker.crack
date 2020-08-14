@@ -1,0 +1,101 @@
+一些关于黑客攻防安全的笔记
+
+零.常数参数表
+1.固定端口表(0~1023)-由IANA组织分配
+	20	FTP(Data)
+	21	FTP(Control)
+	22	SSH
+	23	Telnet
+	25	SMTP
+	53	Domain
+	68	DHCP
+	69	TFTP
+	79	Finger
+	80	HTTP
+	92	NNP
+	93	DCP
+	109	POP2
+	110	POP3
+	111	RPC远程
+	135	Location Service Windows的RPC服务端
+	137/138/139	NetBOIS
+	143	IMAP2
+	156	SQL Service
+	443	HTTPS
+	444	SNPP
+	445	Microsoft-DS
+	554	RTSP
+	1812/1813	Radius协议
+	3389	RDP微软远程桌面
+2.专用文件夹后缀名
+	{2227A280-3AEA-1069-A2DE-08002B30309D}	打印机配置
+	{21EC2020-3AEA-1069-A2DD-08002B30309D}	控制面板
+	{645FF040-5081-101B-9F08-00AA002F954E}	回收站
+	{7007ACC7-3202-11D1-AAD2-00805FC1270E}	Internet连接
+	{871C5380-42A0-1069-A2EA-08002B30309D}	IE浏览器
+	{D20EA4E1-3957-11d2-A40B-0C5020524153}	管理工具
+
+一.CMD命令行
+1.ping	网络连通性
+	-t		连续ping
+	-l size	指定ping的报文大小
+	*127.0.0.1		环回地址，表示TCP/IP协议正常
+	 本机IP			表示网卡到外部网线正常
+	 局域网关IP		表示路由器正常
+	 远程IP			表示Internet访问正常
+	 远程服务器域名	表示DNS设置正常
+	*返回值TTL初步判断主机系统类型(如果没被修改)
+		32	Win98
+		128	Win2000
+		250	Unix
+	 
+2.net	Windows设置和IP网络
+	net view
+	net user
+	net accounts
+	net config [server|workstation]
+	net start|stop|pause|continue		服务管理
+	net send	局域网消息发送，需开启信使服务
+		*net send * "Hello"
+	net ststistics [server|workstation]
+	net share
+3.telnet	telnet协议的客户端(默认端口号23)
+	*探查某个端口是否打开
+		telnet www.buaa.edu.cn 80	//HTTP服务端口80
+4.ftp		ftp协议的客户端(默认端口号21)
+5.netstat	网络状态，活动端口查看
+	-a	获得本机所有连接
+	-n	显示为IP而非DNS解析后的域名
+	-b	列出当前占用每个端口的程序
+	-r	显示本机路由表
+	-s	按照协议分别显示统计数据
+	-e	显示以太网的统计数据
+	*netstat -bn	查外部地址可知信息源的IP和端口号
+6.tracert	查询到达目标IP所经过的路径节点，原理同ping命令
+7.ipconfig	查看TCP/IP配置
+	/all		查看全部
+	/release	归还IP地址给DHCP服务器
+	/renew		向DHCP服务器申请一个IP地址，通常会被给予旧值
+8.route	显示路由信息
+	route print 打印路由表，等效于netstat -r
+	route add|delete
+9.netsh	复杂的忘了配置管理工具
+10.arp	显示和修改地址解析协议(ARP)使用的“IP 到物理”地址转换表
+	-a	显示系统MAC表中的记录
+	-d	删除所有MAC记录
+	-s	添加静态MAc记录
+	*如果ping不通但arp留下了记录，说明ICMP报文被防火墙拦截了
+11.nslookup DNS查看器
+	*默认查询A记录，可用type=mx|ns|ptr|cname|aaaa|text选择修改
+
+二.入侵套路
+1.IPC$空链接漏洞
+	net use \\<Target IP Address>\ipc$ "" /user:"Admin Username"
+2.Telnet入侵
+	建立IPC$空链接后，开启被禁用的Telnet服务
+	断开IPC$后去掉Telnet的NTLM验证，可用opentelnet.exe工具
+	*高级流程
+		X-Scan扫描弱口令主机
+		Openletnet开启Telnet服务、去除NTLM验证、修改Telnet端口
+		AProMan查看杀死进程
+		Instsrv给主机安装服务

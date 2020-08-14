@@ -1,0 +1,246 @@
+/*W3.CSS是W3C组织写的一套纯CSS模板*/
+/*
+	在网页中直接引入
+	<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+	然后以class选择器来应用
+	<div class="w3-container w3-red">
+*/
+
+1.Color：其中color部分替换成具体的red/green/blue等
+	w3-color			背景色
+	w3-text-color		文字色
+	w3-hover-color		行经背景色
+	w3-hover-text-color	行经文字色
+	*Theme：有些颜色可引入额外的css：
+		<link rel="stylesheet" href="/lib/w3-theme-颜色名.css">
+		进而可改变色调深浅：
+		w3-theme-l5 (w3-theme-light) 级别可以是1~5
+		w3-theme
+		w3-theme-d5 (w3-theme-dark)
+2.Container
+	w3-container	常用在div级的标签中，形成一个有边界的方块
+		左右padding=16px；上下padding/margin=0px，可用<hx><p>来拟态上下间距
+	w3-section		与w3-container一起使用
+		上下margin=16px
+	*关闭Container
+	<div class="w3-container w3-red">
+		<span class="w3-closebtn" onclick="this.parentElement.style.display='none'">X</span>
+		<p>To close this container, click on the X in the upper right corner.</p>
+	</div>
+	*显示Container
+	<button class="w3-btn" onclick="document.getElementById('hiddenContainer').style.display='block'">Show container</button>
+	<div id="hiddenContainer" class="w3-container w3-section w3-green" style="display:none">
+		<span onclick="this.parentElement.style.display='none'" class="w3-closebtn">X</span>
+		<p>London is the capital city of England.</p>
+	</div>
+3.Cards：在Container外
+	w3-card		无阴影的卡片方块
+	w3-card-i	i取2/4/8/12/16/24，为边界阴影大小
+	*行经显示阴影
+	<div class="w3-green w3-hover-shadow w3-center">
+	  <p>Hover over me!</p>
+	</div>
+4.Borders
+	w3-border	边框
+	w3-round-xlarge	圆角边框，配合w3-border使用
+	w3-border-left|right|top|bottom	部分边框
+	w3-border-color	边框颜色
+	w3-leftbar|rightbar|topbar|bottombar	部分栅栏
+	w3-hover-border-color	行经边框颜色
+5.Panels
+	w3-panel	显示一个矩形框，常用于notes/quotes
+		*带有内边框和外边框，配合各种bar使用
+6.Fonts
+	w3-tiny|small|medium|large|xlarge|xxlarge|xxxlarge|jumbo
+	默认文字大小：
+		<h1>(36px)
+		<h2>(30px)
+		<h3>(24px)
+		<h4>(20px)
+		<h5>(18px)
+		<h6>(16px)
+	w3-text-shadow	增加文本阴影
+	w3-slim|wide	改变字间距
+	修改字体：取用google字体库，需要自己去<style>中定义
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tangerine">
+	<style>
+	.w3-tangerine {
+	  font-family: 'Tangerine', serif;
+	}
+	</style>
+	改变网页字体：
+	html , body {
+font-family: "Comic Sans MS", cursive, sans-serif;
+}
+7.Padding
+	w3-padding-i	i取4/8/12/24/32/48/64/128
+		改变上下内边距
+	w3-padding-s	s取tiny|small|medium|large|xlarge|xxlarge|xxxlarge|jumbo
+		改变上下内边距，以及两倍的左右内边距
+8.Utilities
+	w3-margin-left|right|top|bottom
+		增加外边距16px
+	w3-round-small|留空|large|xlarge|jumbo
+		设置圆角
+	w3-circle
+		虑为一个椭圆
+	w3-center|left|right
+		位置漂移
+	w3-hide-small|medium|large
+		改变浏览显示大小，就会隐藏该部分
+		*大致对应于phone|tablet|desktop
+9.Buttons
+	w3-btn	变成button，多用在<input><button><a>中
+		配合color/hover/border/round/size使用吧
+	w3-btn-block	全宽button
+		*w3-left|right-align	控制文字漂移
+	w3-btn-group	按钮组
+		<div class="w3-btn-group">
+		  <button class="w3-btn" style="width:33.3%">Button</button>
+		  <button class="w3-btn w3-teal" style="width:33.3%">Button</button>
+		  <button class="w3-btn w3-disabled" style="width:33.3%">Button</button>
+		</div>
+		*配合w3-show-inline-block，使两个button组显示在同一行
+	w3-btn-bar	相似于w3-btn-group，但hover时用图块闪烁效果而非阴影闪烁
+	w3-btn-floating
+	w3-btn-floating-large
+	*禁用按钮
+	<button class="w3-btn w3-disabled">Button</button>
+	<input type="button" class="w3-btn" value="Button" disabled>
+10.Alerts
+	*就是个加了颜色的container
+	<div class="w3-container w3-red">
+	  <h3>Danger!</h3>
+	  <p>Red often indicates a dangerous or potentially negative action.</p>
+	</div> 
+11.Tables
+	w3-table	用在<table>里
+	w3-striped	明暗相间
+		*翻转明暗位置：外套<thead>标签
+			<thead><tr><td></td></tr></thead>
+	w3-border	外边框
+	w3-bordered	内边框
+	w3-hoverable	行经闪烁行
+		*自定义闪烁颜色
+			<tr class="w3-hover-green"></tr>
+	w3-responsive	用在外套的<div>中，显示一个水平滚动条
+		*<div class="w3-responsive"><table>Lorem Ipsum</table></div?
+12.Lists
+	w3-ul	用在<ul>中
+		*可配合w3-hoverable
+	*可关闭的<li>
+	<li>Jill 
+	  <span onclick="this.parentElement.style.display='none'" 
+	  class="w3-closebtn w3-margin-right w3-medium">x</span>
+	</li>
+13.Images
+	w3-round|circle|border	用在<img>中
+	w3-hover-opacity
+	w3-opacity
+		*自定义透明度
+			<img src="img_forest.jpg" alt="Forest" class="w3-opacity" style="opacity:0.2">
+	*图片上显示文字
+	<div class="w3-display-container">
+	  <img src="img_lights.jpg" alt="Lights">
+	  <div class="w3-display-topleft w3-container">Top Left</div>
+	  <div class="w3-display-topright w3-container">Top Right</div>
+	  <div class="w3-display-bottomleft w3-container">Bottom Left</div>
+	  <div class="w3-display-bottomright w3-container">Bottom Right</div>
+	  <div class="w3-display-middle w3-large">Middle</div>
+	</div>
+	*构造影集
+	<div class="w3-third">	//w3-third控制在同一行显示3个，同理还有w3-half
+	  <div class="w3-card-2">
+		<img src="img_monterosso.jpg" style="width:100%">
+		<div class="w3-container">
+		  <h4>Monterosso</h4>
+		</div>
+	  </div>
+	</div>
+14.Inputs
+	w3-input	用在<input>里
+	w3-label	绿色
+		*自定义颜色：
+			w3-text-blue
+	w3-validate	红色，填字后变绿
+	w3-border-0	去掉<input>默认的边框
+	w3-animate-input	获得焦点时变为全宽
+	w3-check	用在<input type="check">里
+	w3-radio	用在<input type="radio">里
+	*构建表单
+	<form class="w3-container">
+		<label class="w3-label">Usename</label>
+		<input class="w3-input" type="text">
+		<label class="w3-label w3-validate">Password</label>
+		<input class="w3-input" type="password">
+	</form>
+	*下拉菜单
+	<select class="w3-select" name="option">
+	  <option value="" disabled selected>Choose your option</option>
+	  <option value="1">Option 1</option>
+	  <option value="2">Option 2</option>
+	  <option value="3">Option 3</option>
+	</select>
+15.Badges && Tags
+	w3-badge	常用在<p><hx>中，构成椭圆形徽章
+	w3-tag		构成矩形徽章
+16.Built-In Responsiveness
+	w3-row|w3-row-padding	行锁定
+	w3-half|third|twothird|quarter|threequarter|rest|col	控制列宽
+		*使用style=百分数
+		    <div class="w3-col" style="width:20%"><p>20%</p></div>
+			<div class="w3-rest"><p>60%</p></div>
+	w3-content	固定列宽的置中的内容
+		<body class="w3-content" style="max-width:500px">
+		  page content...
+		</body>
+	*例子：
+	<div class="w3-row">	//必须先锁定行
+	  <div class="w3-green w3-container w3-half">
+		<h2>w3-half</h2> 
+	  </div>
+	  <div class="w3-container w3-half">
+		<h2>w3-half</h2> 
+	  </div>
+	</div>
+17.Animate
+	w3-animate-left|right|top|bottom	滑入
+	w3-animate-opacity	淡入
+	w3-animate-zoom		放大
+	w3-spin				一直旋转
+	w3-animate-fading	10s交替显隐
+18.Dropdowns
+	w3-dropdown-hover	行经触发下拉菜单
+	w3-dropdown-click	点击触发下拉菜单
+	w3-dropdown-content	触发显示的部分
+	*例子：
+	<div class="w3-dropdown-hover">
+	  <button class="w3-btn w3-red">Hover Me!</button>
+	  <div class="w3-dropdown-content w3-border">
+		<a href="#">Link 1</a>
+		<a href="#">Link 2</a>
+		<a href="#">Link 3</a>
+	  </div>
+	</div>
+19.Accordions
+
+	
+20.Model
+<div class="w3-modal w3-pale-yellow" style="display: block">
+      <div class="w3-card-4 w3-modal-content" style="max-width: 400px">
+        <div class="w3-container w3-green">
+          <h2 class="w3-center w3-text-white">你大概是走错门了……</h2>
+        </div>
+        <div class="w3-container w3-white w3-center">
+          <div class="w3-container">
+            <img width=150 height=150 id="joke_pic" src="joke.jpeg" style="display: inline-block" />
+            <img width=150 height=150 id="joke_open_pic" src="joke_open.jpeg" style="display: none" />
+          </div>
+          <p class="w3-center w3-text-indigo">请使用ftp协议~<br />或者，请直接点这个<a href="ftp://www.bs2014.tk">链接</a>——</p>
+          <p class="w3-center w3-text-red">（推荐使用资源管理器或FTP客户端，<br />而不是网页浏览器来访问……）</p>
+          <p id="joke" class="w3-btn w3-large w3-center w3-blue w3-text-white" style="display: inline-block" onclick="joke()">但这里并没有链接</p>
+          <p id="joke_open" class="w3-btn w3-large w3-center w3-red w3-text-white" style="display: none">都说了不是让你点这里啊喂！！</p>
+        </div>
+      </div>
+    </div>
+

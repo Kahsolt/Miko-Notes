@@ -1,0 +1,73 @@
+//MFC是基于C++的微软基础框架
+//是对C/SDK的再封装
+
+零.引用
+#include<afxwin.h>
+
+一.通用类
+1.基类
+	CObject
+2.异常处理
+	CException
+	C*Exception
+3.内存诊断类
+	CMemoryState
+4.集合类
+	C*Array
+	C*List
+	CMap*To*
+5.动态字符串类
+	CString
+6.文件类
+	C*File
+7.时间类
+	CTime*
+8.混合
+	CPoint
+	CRect
+	CSize
+
+二.Windows API类
+1.应用程序类
+	CCmdTarget
+	CCmdUI
+	CWinThread
+	CWinApp
+	CCommandLineInfo
+	CWaitCursor
+2.同步对象类
+	CSyncObject
+	CCriticalSection
+	CSemphore
+	CMutex
+	CEvent
+	C*Lock
+3.窗体GUI
+	CWnd
+	C*FrameWnd
+	CMenu
+	C*Dialog
+	CButton
+	CBitmapButton
+	CStatic
+	CEdit
+	CScrollBar
+	CComboBox
+	CListBox
+	CCheckListBox
+	CDragListBox
+	CAnimateCtrl
+	CHeaderCtrl
+	CHotKeyCtrl
+	CImageList
+	CListCtrl
+	CTreeCtrl
+	CProgressCtrl
+	CRichEditCtrl
+	CSliderCtrl
+	CSpinButtonCtrl
+	CStatusBarCtrl
+	CTabCtrl
+	CToolBarCtrl
+	CTooTipCtrl
+	

@@ -1,0 +1,73 @@
+# Pig可以视作Hadoop或者HDFS的命令行前端
+# Latin是其类SQL的脚本语言，多用于数据处理
+
+零.命令行
+0.运行模式
+  本地模式	pig -x local
+  MR模式	pig -x mapreduce(默认，参数可省略)
+
+一.Latin脚本语言
+0.数据类型
+  基本
+    boolean
+    int/long/biginteger
+    float/double/bigdecimal
+    bytearray			# 默认(blob)，在运算中会尝试自动类型转换
+    chararray			# UTF-8编码
+    datetime
+  复合
+    tuple	(19,2)
+    bag		{(19,2), (18,1)}	# 一组tuple
+    map		[open#apache]
+1.数据存取：注意变量名后的空格
+  A = LOAD 'data' USING PigStorage(' ') AS (f1,f2,f3);	# 默认类型bytearray
+  A = LOAD 'ping' as (min:int, max:int, avg:int);	# 自定义名
+  DESCRIBE A;						# 查看数据结构
+  DUMP A;							# 查看数据
+  B = FOREACH A GENERATE avg;		# 列过滤
+  B = FOREACH A GENERATE COUNT($0);	# 聚合，count按列序号
+  B = FOREACH A GENERATE AVG(A.min), AVG(A.max);
+  STORE B INTO 'ping.avg';
+2.数据操作
+运算
+  B = FOREACH A GENERATE a + (int)null;
+  B = FOREACH A GENERATE CONCAT(a,b);
+筛选
+  A = LOAD 'student' AS (name, age, gpa); 
+  B = FILTER A BY name is not null;
+  B = FILTER A BY (age<=13) OR (NOT (gpa + 2 > age));
+  
+  A = LOAD 'data' AS (T: tuple(name: chararray, age: int));
+  B = FILTER A BY T == ('john', 25);
+  C = FOREACH B GENERATE T.name, [25#5.6], {(1, 5, 18)};
+整理
+  B = GROUP A ALL;	# 分组后才能做聚合函数计算
+  B = GROUP A BY avg;
+  B = GROUP A BY price * count;
+  B = ORDER A BY avg;
+连接
+  A = LOAD 'student' AS (name: chararray, age: int, gpa: float);
+  B = LOAD 'donation' AS (name: chararray, donation: float);
+  # 内连接
+  X = JOIN A BY name, B BY name;
+  # 外连接
+  Y = COGROUP A BY name, B BY name;
+  D = FOREACH Y GENERATE FLATTEN((IsEmpty(A) ? null : A)), FLATTEN((IsEmpty(B) ? null : B));
+
+3.storage
+PigStorage，默认字符分割读入，默认用TAB分隔，可传参改变
+BinStorage，默认情况下 map/reduce job 的存储方式，用户也可以使用（可以 load 也可以 store），builtin；
+JsonLoader/JsonStorage，前者需要指定 schema，builtin
+TextLoader,用来读入文本，每行一个 chararray，builtin
+AvroStorage（org.apache.pig.piggybank.storage.avro ）用来读取和存储 avro 格式的文件，读取也需要 schema，或者指定或者有个 schema 文件
+CVSLoader（org.apache.pig.piggybank.storage）用来载入 CVS 文件
+DBStorage（org.apache.pig.piggybank.storage）用于写入 DB，需要指定数据库驱动和使用的 SQL 语句
+HadoopJobHistoryLoader（同上）呃，这也行…
+IndexedStorage（同上），支持 per-record seek 的存储
+MultiStorage（同上），产生多个 output directory，根据用户指定的规则进行拆分
+RegExLoader 与 MyRegExLoader（同上），根据 RE 对 log 进行分析
+SequenceFileLoader（同上），用来读取 sequence file
+XMLLoader（同上），用来 load XML 文件的内容，需要提供 schema。
+HBaseStorage（org.apache.pig.backend.hadoop.hbase）用来从 HBase 里面读入和写入数据
+HDataStorage（org.apache.pig.backend.hadoop.datastorage ）看不出来干啥的…
+TableLoader/TableStorer（org.apache.hadoop.zebra.pig）用来处理 zebra 格式的数据，好像现在没啥人用了？

@@ -1,0 +1,107 @@
+#注册表是Windows95开始引入的概念，是Win的核心数据库，更早期的环境配置文件是System.ini和Win.ini
+#注册表以二进制文件存储，由Regedit.exe编辑
+
+零.结构
+根键：
+HKEY_ClASSES_ROOT		文件扩展名、应用关联、OLE信息
+	command		指明与某应用程序相关联
+	ShellEx\PropertyHandler	指明与Windows外壳扩展中某属性页的句柄相关联
+	ShellNew\NullFile	此键值清空则可将某文件扩展名加入系统右键“新建”菜单
+HKEY_CURRENT_USER		当前用户控制面板选项、桌面设置、映射的网络驱动器
+	*此键与HKEY_USERS\.DEFAULT有公共部分
+HKEY_LOCAL_MACHINE		计算机硬件、应用程序信息
+	\HARDWARE	超文本终端、数学协处理器和串口信息
+		\DEVICEMAP		设备映像
+		\DESCRIPTION	系统信息
+	\SAM	未知，受系统保护
+	\SECURITY	安全设置，，受系统保护
+	\SOFTWARE	系统软件、安装的应用软件及用户信息
+	\SYSTEM		系统启动和修复时所需信息
+		\CurrentControlSet	驱动程序控制集
+			\Control	控制面板中各个图标程序的信息
+				\FontAssoc	字体设置
+				\Nls	Windows语言特性(代码页、EUDC内码范围、语言分类)
+				\Session Manager	管理系统会话
+					\KnownDLLs	所有32位Dll文件及标识
+					\CheckBadApps(400)	检查有问题的16位(32位)应用程序
+					\AppPatches	应用程序补丁
+				\MediaResources	多媒体资源
+				\MediaProperties	多媒体属性
+				\FileSystem	文件系统
+				\Shutdown	关机设置
+				\Keyboard Layouts	键盘布局、键盘语言
+				\TimeZoneInformation	时区
+				\Print	打印机
+				\IDConfigDB	硬件配置文件的数据和名称
+				\ComputerName	计算机名称
+				\SecurityProviders	网络供应商安全
+			\Services	Windows服务
+				\VXD	虚拟设备驱动信息
+				\WinSock(2)	连接Internet时的WinSock(2.0)信息
+				\WDMFS	WDM文件系统
+				\Update	更新服务
+				\RemoteAccess	拨号网络信息
+HKEY_USERS				所有登录用户信息
+	\.DEFAULT	默认用户设置
+		\AppEvents	已注册的应用事件
+		\Control Panel	控制面板信息
+			\Accessibility	辅助选项
+			\Appearance	色彩方案
+			\Cursors	光标
+			\Colors	窗体及控件颜色
+			\Desktop	控件长宽及字体
+			\WindowsMetrics	如何显示窗口
+			\Input Method	切换输入法热键
+			\International	区域和语言选项
+			\Keyboard	键盘速度属性
+			\Mouse	鼠标属性
+		\Keyboard Layout	键盘布局、加载顺序
+		\Software	应用程序
+			*此键是HKEY_LOCAL_MACHINE\Software的一部分
+HKEY_CURRENT_CONFIG		计算机硬件配置信息
+
+值类型：
+字符串值	可含汉字的字符串，最长255个字符；常用来表示文件描述和硬件标识
+二进制值	二进制串，无长度限制；以十六进制表示
+DWORD值		一个32位(4字节)的值；以十六进制表示
+
+一.注册表维护
+Regedit.exe
+	(/C) <文件名> 导入
+	/E <文件名>	导出
+	/L:[system.dat路径]
+	/R:[user.dat路径]
+	<regpath> 以此作为关键字
+reg脚本
+	Windows Registry Editor Version 5.00	文件头
+	<强制空一行>
+	[HKEY_开头的字串]		键
+	@="DefaultValue"		@号表示默认值
+	"A"="String"			字符串值
+	"B"="hex:ff"			二进制值
+	"C"="dword:00000064"	DWORD值
+	[-HKEY_开头的字串]		删除键
+	"A"=-					删除值
+inf脚本
+	[VERSION]
+	SIGNATURE=Windows本版名
+	[DEFAULTINSTALL]	指出本inf的其他段
+	ADDREG=MY.ADDREG
+	DELREG=MY.DELREG
+	[MY.ADDREG]
+	HKLM,...	主键用减缩字且逗号分隔；主键-子键-名称-值类型(0字符串1,二进制值)-值
+	[MY.DELREG]
+	HKCU,...
+VBS脚本
+	Dim WSHShell
+	Set WSHShell=WScript.CreateObject("WScript.Shell")
+	WSHShell.RegWrite "HKCU\MyKey\Value",2,"RG_DWORD"
+	WSHShell.Popup "HKCU\MyKey\"
+	
+二.常用键值
+1.启动项：RunService先于Run加载
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+2.右键加入“命令提示符打开”
+HKEY_CLASSES_ROOT\*\shell下新建项，默认值为提示语
+再建立\command，默认值为命令行

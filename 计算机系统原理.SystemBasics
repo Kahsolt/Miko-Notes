@@ -1,0 +1,176 @@
+#操作系统Operating System基础原理
+
+零.编译系统
+	预处理阶段cpp：	.cpp->.i
+		处理#开头的行，展开所有引入和宏定义
+	编译阶段ccl：	.i->.s
+		高级语言变成汇编语言
+	汇编阶段as：	.s->.o
+		汇编语言变成机器指令(二进制文件)
+	链接阶段ld：	.o+.a(静态库)->.exe
+		汇集所有.o文件生成可执行文件
+*产生汇编代码(.c->.s)
+	gcc -O1 -S code.c(pp)
+ 产生机器码(.s->.o)
+	gcc -O1 -C code.c
+ 反汇编代码(.o->.s)
+	objdump -d code.o
+	
+一.信息的表示和处理
+1.进制
+*当x=pow(2,n)时写出[x]16:
+	分解n=i+4j，则ans的第一位为{1,2,4,8|i=0,1,2,3}，后面跟着j个十六进制的0
+  字长word size
+	字长是整数和指针数据的标称大小
+	对于一个字长为w的机器，可访问的虚拟地址为[0,pow(2,w)-1]共pow(2,w)个字节
+  寻址和字节顺序
+	例：int x占4个字节值为0x01234567，在地址0x100~0x103
+	小端法，最低有效字节在前面
+		0x100	0x101	0x102	0x103
+		67		 45		23		01
+	大端法，最高有效字节在前面
+		0x100	0x101	0x102	0x103
+		01		23		45		67
+  位运算
+	>>	算术右移(负数补1)
+	>>>	逻辑右移
+	*移动k位(k>w)，则实际移动k%w位
+	
+2.整数表示
+  无符号数编码B2U(w)：从右向左第i个算子代表值pow(2,i-1)，各位加和
+  补码编码B2T(w)：除最高位为负权-pow(2,w-1)以外，剩余从右向左第i个算子代表值pow(2,i-1)，各位加和
+	*最高位为0时B2U(w)=B2T(w)
+	 最高位为1时B2U(w)-B2T(w)=pow(2,w)
+		反码编码B2O(w)：除最高位为负权-pow(2,w-1)+1以外，剩余从右向左第i个算子代表值pow(2,i-1)，各位加和
+		原码编码B2S(w)：最高位决定剩余位的正负权，其余从右向左第i个算子代表值pow(2,i-1)，各位加和
+	*有无符号转换： T2U(w)={x,x+pow(2,w)|x>=0,x<0}
+					U2T(w)={u,u-pow(2,w)|u<pow(2,w-1),u>=pow(2,w-1)}
+  扩展：有符号1扩展，无符号0扩展
+  截断：对于无符号数x，截断k位即计算x%k
+3.整数运算
+  无符号加法：高位溢出丢弃，等价于计算和并%pow(2,w)
+  补码加法：x+y=U2T(w)((x+y)%pow(2,w))；正溢出变负，负溢出变正
+	*补码的非：~x+1==-x
+  无符号乘法：高位溢出丢弃，等价于计算积并%pow(2,w)
+  补码乘法：x*y=U2T(w)((x*y)%pow(2,w))
+	*乘以常数：一般可作变换使x*K=Σ(x<<Ki)-Σ(x<<Kj)
+		负数偏置：(x<0?(x+(1<<k)-1):x)>>k
+		
+4.浮点数表示
+  二进制小数：只能表示能被写作x*pow(2,y)的数
+  IEEE浮点标准：符号s/S+阶码exp/E+尾数frac/M	(单精度：s=1/k=8/n=23|双精度：s=1/k=11/n=52)
+					形式				阶码值E		尾数M
+	规格化数	阶码非全0非全1			exp-Bias	1+frac
+	非规格化数	阶码全0					1-Bias		frac
+	无穷大		阶码全1，尾数全0
+	NaN			阶码全1，尾数非全0		*偏置值Bias=pow(2,k-1)-1
+  舍入：向偶数舍入
+  
+二.汇编反汇编——机器级表示 
+1.寄存器
+	累加寄存器		%eax	%ax		%ah+%al
+	计数寄存器		%ecx	%cx		%ch+%cl
+	数据寄存器		%edx	%dx		%dh+%dl
+	基址寄存器		%ebx	%bx		%bh+%bl
+	源变址寄存器	%esi	%si
+	目的变址寄存器	%edi	%di
+	堆栈指针		%esp	%sp
+	基址指针		%ebp	%bp
+*操作数表达式Imm(Eb,Ei,s)-> 寻址值Imm+R[Eb]+R[Ei]*s
+  立即数Imm					Imm-立即数偏移
+  寄存器E(索值-R[E])		Eb-基址寄存器	Ei-变址寄存器
+  存储器Addr(索值-M[Addr])	s-比例因子，必须是[1,2,4,8]
+
+2.数据传送指令
+	movb/movw/movl	S,D			等长传送		S->D
+	movsbw/movsbl/movswl S,D	符号扩展传送	S->D
+	movzbw/movzbl/movzwl S,D	零扩展传送		S->D
+		*传送方向：	Imm->Reg/Mem
+					Reg->Reg/Mem
+					Mem->Reg
+	pushl S		双字压栈		R[%esp]-4->R[%esp];S->M[R[%esp]]
+	popl D		双字出栈		M[R[%esp]]->D;R[%esp]+4->R[%esp]
+	
+3.算数与逻辑指令
+	leal S,D(D必须为寄存器)		加载有效地址	&S->D
+	*以下省略数据格式后缀：
+		inc D		加1		D+1->D
+		dec D		减1		D-1->D
+		neg D		取负	-D->D
+		not D		取补	~D->D
+		add S,D		加		D+S->D		*运算的S和D不能同时为储存器
+		sub S,D		减		D-S->D
+		imul S,D	乘		D*S->D
+		xor S,D		异或	D^S->D		*xorl %edx,%edx -清空%edx寄存器
+		or S,D		或		D|S->D
+		and S,D		与		D&S->D
+		sal k,D		左移	D<<k->D		*移位量只能为立即数Imm或寄存器%cl的值
+		shl k,D		左移	D<<k->D
+		sar k,D		算数右移D>>(Alg)k->D
+		shr k,D		逻辑右移D>>(Lgc)k->D
+	cltd		转为四字			SignExtend(R[%eax])->R[%edx]:R[%eax]
+	imull S		有符号全64位乘法	S*R[%eax]->R[%edx]:R[%eax]
+	mull S		无符号全64位乘法	S*R[%eax]->R[%edx]:R[%eax]
+	idivl S		有符号除法			R[%edx]:R[%eax]%S->R[%edx]
+	divl S		无符号除法			R[%edx]:R[%eax]/S->R[%eax]
+
+4.条件码；%eip寄存器
+	CF	进位标志Carry Flag，最近操作产生进位，可检查无符号操作数的溢出
+	ZF	零标志Zero Flag，最近操作结果为0
+	SF	符号标志Sign Flag，最近操作结果为负
+	OF	溢出标志Overflow Flag，最近操作导致一个补码溢出
+	*仅设置条件码的指令(已省略数据格式后缀)：
+		cmp	S2,S1	S1-S2
+		test S2,S1	S1&S2	*testl %eax,%eax -测试%eax寄存器的正负零性
+5.访问条件码(同义名已省略)
+	sete  D		相等/零		ZF->D
+	setne D		不等/非零	~ZF->D
+	sets  D		负数		SF->D
+	setns D		非负数		~SF->D
+	setg  D		大于		~(SF^OF)&~ZF->D		*有符号数
+	setge D		大于等于	~(SF^OF)->D
+	setl  D		小于		SF^OF->D
+	setle D		小于等于	(SF^OF)|ZF->D
+	seta  D		超过		~CF&~ZF->D			*无符号数
+	setae D		超过相等	~CF->D
+	setb  D		低于		CF->D
+	setbe D		低于相等	CF|ZF->D
+	*常用单字节寄存器作D，这个字节将被设置成0或者1，再用movzbl %al,%eax移至四字节寄存器
+
+6.跳转(同义名已省略)
+	jmp Label		直接跳转，跳转到代码中某标签处
+	jmp *Operand	间接跳转，如*%eax跳转到R[%eax]，或*(%eax)跳转到M[R[%eax]]
+	je  Label		条件跳转
+	jne Label
+	js  Label
+	jns Label
+	jg  Label		*有符号数
+	jge Label
+	jl  Label
+	jle Label
+	ja  Label		*无符号数
+	jae Label
+	jb  Label
+	jbe Label
+7.条件传送指令(同义名已省略)
+	cmove	S,R		S->R(下同)
+	cmovne	S,R
+	cmovs	S,R
+	cmovns	S,R
+	cmovg	S,R		*有符号数
+	cmovge	S,R
+	cmovl	S,R
+	cmovle	S,R
+	cmova	S,R		*无符号数
+	cmovae	S,R
+	cmovb	S,R
+	cmovbe	S,R
+		*传送方向：	Reg/Mem->Reg
+
+8.过程
+	pushl	S		%esp-4入栈
+	popl	D		%esp+4出栈
+	call	Lable	将返回地址(call指令后一条语句)入栈，跳转至过程入口
+	call	Operand	%eax/%edx/%ecx调用者保存，%ebx/%esi/%edi被调用者保存
+	leave				
+	ret					
